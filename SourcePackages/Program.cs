@@ -12,6 +12,7 @@ namespace SourcePackages
 {
     class Program
     {
+        static string pathToSearch = @"c:\git\";
         static void Main(string[] args)
         {
             RunAsync().GetAwaiter().GetResult();
@@ -34,9 +35,9 @@ namespace SourcePackages
         {
             List<Task> myTasks = new List<Task>
             {
-            NugetPackage.SearchForPackagesConfig(@"C:\git\raycare"),
-            NugetPackage.SearchForAllPackageReferences(@"C:\git\raycare"),
-            NpmPackage.LoopPackageJson(@"c:\git\raycare")
+            NugetPackage.SearchForPackagesConfig(pathToSearch),
+            NugetPackage.SearchForAllPackageReferences(pathToSearch),
+            NpmPackage.LoopPackageJson(pathToSearch)
             };
             await Task.WhenAll(myTasks);
         }

@@ -33,7 +33,7 @@ namespace SourcePackages.packages
 
                     foreach (XmlNode node in nodes)
                     {
-                        if (node.Attributes != null)
+                        if (node.Attributes != null && (node.Attributes["Version"] != null || node.Attributes["version"] != null))
                         {
                             string packageVersion;
                             if (node.Attributes["Version"] == null)
@@ -44,9 +44,11 @@ namespace SourcePackages.packages
                             {
                                 packageVersion = node.Attributes["Version"].Value;
                             }
-
-                            //await Utils.AddToPackageInformation(new PackageInformation { PackageName = node.Attributes["Include"].Value, PackageVersion = packageVersion, PackageDescription = "", OriginOfPackage = PackageInformation.Origin.PackageReference });
                             FactoryPackages.AddPackage(new NugetPackage { Name = node.Attributes["Include"].Value, Version = packageVersion, UniqueName = "PackageReference", PackageType = PackageType.Nuget });
+                        }
+                        else
+                        {
+                            //Console.WriteLine(file + "No version found in PackageReference");
                         }
 
                     }
