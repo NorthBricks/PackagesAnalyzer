@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SourcePackages.packages;
+using Newtonsoft.Json;
+using System.IO;
+
 namespace SourcePackages
 {
     class Program
@@ -13,6 +16,13 @@ namespace SourcePackages
         {
             RunAsync().GetAwaiter().GetResult();
             Console.WriteLine(FactoryPackages.GetPackages().Count);
+
+            var json = JsonConvert.SerializeObject(FactoryPackages.GetPackages());
+            using (StreamWriter file = File.CreateText(@"c:\temp\packagesGenerated.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, FactoryPackages.GetPackages());
+            }
             foreach (var item in FactoryPackages.GetPackages().OrderBy(x => x.Name))
             {
 
@@ -24,9 +34,9 @@ namespace SourcePackages
         {
             List<Task> myTasks = new List<Task>
             {
-            NugetPackage.SearchForPackagesConfig(@"C:\git\RayCare"),
-            NugetPackage.SearchForAllPackageReferences(@"C:\git\RayCare"),
-            NpmPackage.LoopPackageJson()
+            NugetPackage.SearchForPackagesConfig(@"C:\git\raycare"),
+            NugetPackage.SearchForAllPackageReferences(@"C:\git\raycare"),
+            NpmPackage.LoopPackageJson(@"c:\git\raycare")
             };
             await Task.WhenAll(myTasks);
         }

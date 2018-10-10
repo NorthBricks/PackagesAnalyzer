@@ -19,9 +19,9 @@ namespace SourcePackages.packages
 
         }
 
-        public static async Task LoopPackageJson(string packageJsonPath = @"C:\git\RayCare\src\adapters\RayCare.Web.UI\package.json")
+        public static async Task LoopPackageJson(string packageJsonPath)
         {
-            string[] packageJson = Directory.GetFiles(@"c:\git\RayCare", "package.json", SearchOption.AllDirectories);
+            string[] packageJson = Directory.GetFiles(packageJsonPath, "package.json", SearchOption.AllDirectories);
             await Task.Run(() =>
             {
                 foreach (var item in packageJson)
