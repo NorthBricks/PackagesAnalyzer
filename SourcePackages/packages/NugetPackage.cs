@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Northbricks.SourceDependencies
+namespace Northbricks.PackagesAnalyzer
 {
     public class NugetPackage : PackageMagic
     {

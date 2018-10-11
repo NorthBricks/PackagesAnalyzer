@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Northbricks.SourceDependencies")]
+[assembly: AssemblyTitle("Northbricks.PackagesAnalyzer")]
 [assembly: AssemblyDescription("Package Resolver")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Northbricks")]
-[assembly: AssemblyProduct("Northbricks.SourceDependencies")]
+[assembly: AssemblyProduct("Northbricks.PackagesAnalyzer")]
 [assembly: AssemblyCopyright("Tobias Larsson Northbricks Copyright ©  2018")]
 [assembly: AssemblyTrademark("Northbricks")]
 [assembly: AssemblyCulture("")]

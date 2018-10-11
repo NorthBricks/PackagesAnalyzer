@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Northbricks.SourceDependencies
+namespace Northbricks.PackagesAnalyzer
 {
     public enum PackageType
     {

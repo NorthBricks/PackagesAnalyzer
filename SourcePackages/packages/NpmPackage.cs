@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Northbricks.SourceDependencies
+namespace Northbricks.PackagesAnalyzer
 {
     public class NpmPackage : PackageMagic
     {

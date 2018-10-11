@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NuGet;
-using Northbricks.SourceDependencies;
+using Northbricks.PackagesAnalyzer;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;

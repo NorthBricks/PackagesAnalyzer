@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Northbricks.SourceDependencies
+namespace Northbricks.PackagesAnalyzer
 {
     public class Ids
     {
