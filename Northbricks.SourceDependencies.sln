@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourcePackages", "SourcePackages\SourcePackages.csproj", "{951A46CE-3997-4644-AB05-37805E8EC980}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Northbricks.SourceDependencies", "SourcePackages\Northbricks.SourceDependencies.csproj", "{951A46CE-3997-4644-AB05-37805E8EC980}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SourcePackages")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Northbricks.SourceDependencies")]
+[assembly: AssemblyDescription("Package Resolver")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SourcePackages")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Northbricks")]
+[assembly: AssemblyProduct("Northbricks.SourceDependencies")]
+[assembly: AssemblyCopyright("Tobias Larsson Northbricks Copyright ©  2018")]
+[assembly: AssemblyTrademark("Northbricks")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

@@ -4,26 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SourcePackages.packages;
+
 using Newtonsoft.Json;
 using System.IO;
 
-namespace SourcePackages
+namespace Northbricks.SourceDependencies
 {
     class Program
     {
-        static string pathToSearch = @"c:\git\";
+        static string pathToSearch = @"c:\git\rtest";
         static void Main(string[] args)
         {
+            //FactoryPackages.LoadPackagesJson();
             RunAsync().GetAwaiter().GetResult();
             Console.WriteLine(FactoryPackages.GetPackages().Count);
+            var obj = JsonConvert.SerializeObject(FactoryPackages.GetPackages(), new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+            File.WriteAllText(@"c:\temp\packagesGenerated.json", obj);
 
-            var json = JsonConvert.SerializeObject(FactoryPackages.GetPackages());
-            using (StreamWriter file = File.CreateText(@"c:\temp\packagesGenerated.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, FactoryPackages.GetPackages());
-            }
             foreach (var item in FactoryPackages.GetPackages().OrderBy(x => x.Name))
             {
 
@@ -38,8 +35,15 @@ namespace SourcePackages
             NugetPackage.SearchForPackagesConfig(pathToSearch),
             NugetPackage.SearchForAllPackageReferences(pathToSearch),
             NpmPackage.LoopPackageJson(pathToSearch)
+
             };
             await Task.WhenAll(myTasks);
+            await OssIndexClient.CheckOSSPackage();
+            await NugetPackage.GetNugetPackageInformation();
+
+            //await NpmPackage.RunNpmViewCheckLicense();
+            //await NpmPackage.RunNpmView();
+
         }
     }
 }

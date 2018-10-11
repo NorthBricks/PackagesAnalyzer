@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using NuGet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,15 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SourcePackages.packages
+namespace Northbricks.SourceDependencies
 {
-    public class NpmPackage
+    public class NpmPackage : PackageMagic
     {
         public static string NpmRegistry { get; set; }
+
         public static readonly string NpmPath;
         static NpmPackage()
         {
             NpmPath = FindNpmPath("npm.cmd");
+            //Providers.Add(PackageProviders.GitHub);
+            //Providers.Add(PackageProviders.OssIndex);
 
         }
 
@@ -61,6 +65,7 @@ namespace SourcePackages.packages
                 {
                     var p = (JProperty)jToken;
                     //var license = await RunNpmViewCheckLicense(p.Name, p.Value.ToString());
+
                     //await Utils.AddToPackageInformation(new PackageInformation { PackageName = p.Name, PackageVersion = p.Value.ToString(), PackageDescription = "", OriginOfPackage = PackageInformation.Origin.Npm, FeedRegistry = NpmRegistry });
                     FactoryPackages.AddPackage(new NugetPackage { Name = p.Name, Version = p.Value.ToString(), UniqueName = "dependencies", PackageType = PackageType.Npm });
                 }
@@ -87,7 +92,183 @@ namespace SourcePackages.packages
 
             return Path.GetFullPath(npmCmd);
         }
+        public static async Task RunNpmViewCheckLicense()
+        {
+            JObject output = null;
+            string license = String.Empty;
+            await Task.Run(() =>
+            {
+                foreach (var package in FactoryPackages.GetPackages().FindAll(o => o.PackageType == PackageType.Npm))
+                {
+                    try
+                    {
+                        var packageToCheck = $"{package.Name}@{package.Version}";
+                        //return output;
+                        var psiNpmRunDist = new ProcessStartInfo
+                        {
+                            FileName = NpmPath,
+                            Arguments = $"view {packageToCheck}",
+                            RedirectStandardInput = true,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            StandardOutputEncoding = Encoding.UTF8
+                        };
 
+                        var pNpmRunDist = Process.Start(psiNpmRunDist);
+
+
+                        if (pNpmRunDist != null)
+                        {
+                            try
+                            {
+                                output = JObject.Parse(pNpmRunDist.StandardOutput.ReadToEnd());
+                            }
+                            catch (Exception)
+                            {
+                                output = null;
+                            }
+
+                            pNpmRunDist.StandardInput.WriteLine("npm run view & exit");
+                            pNpmRunDist.WaitForExit();
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        output = null;
+
+                    }
+
+                    try
+                    {
+                        JToken licenseToken = output.GetValue("license");
+                        if (licenseToken != null)
+                        {
+                            license = licenseToken.ToString();
+                        }
+
+                        if (license == null)
+                        {
+                            foreach (var item in output)
+                            {
+                                if (item.Key.ToLower() == "licenses")
+                                {
+                                    foreach (JObject val in item.Value.Children())
+                                    {
+                                        foreach (var d in val)
+                                        {
+                                            if (d.Key == "type")
+                                            {
+                                                license = d.Value.ToString();
+                                                break;
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+
+                    if (license != null)
+                    {
+                        Console.WriteLine("Npm licensetype " + license);
+                        package.LicenseType = license;
+                    }
+
+                }
+            });
+            //return license;
+        }
+
+        public static async Task<JObject> RunNpmView()
+        {
+            JObject output = null;
+            try
+            {
+                foreach (var package in FactoryPackages.GetPackages().FindAll(o => o.PackageType == PackageType.Npm))
+                {
+                    var packageToCheck = $"{package.Name}@{package.Version}";
+
+                    //return output;
+                    var psiNpmRunDist = new ProcessStartInfo
+                    {
+                        FileName = NpmPath,
+                        Arguments = $"view {packageToCheck}",
+                        RedirectStandardInput = true,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        StandardOutputEncoding = Encoding.UTF8
+                    };
+                    await Task.Run(() =>
+                    {
+                        var pNpmRunDist = Process.Start(psiNpmRunDist);
+
+
+                        if (pNpmRunDist != null)
+                        {
+                            try
+                            {
+                                output = JObject.Parse(pNpmRunDist.StandardOutput.ReadToEnd());
+                            }
+                            catch (Exception)
+                            {
+                                output = null;
+                            }
+
+                            pNpmRunDist.StandardInput.WriteLine("npm run view & exit");
+                            pNpmRunDist.WaitForExit();
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                output = null;
+
+            }
+            try
+            {
+                dynamic outputDynamic = output;
+                var license = output.GetValue("license");
+
+                //var licenses = output.GetValue("licenses");
+                //if (licenses != null)
+                //{
+                if (license == null)
+                {
+                    foreach (var item in output)
+                    {
+                        if (item.Key.ToLower() == "licenses")
+                        {
+                            foreach (JObject val in item.Value.Children())
+                            {
+                                foreach (var d in val)
+                                {
+                                    Console.WriteLine($"{d.Key} {d.Value.ToString()}");
+                                }
+                            }
+
+                        }
+                    }
+                }
+                //    Utils.LogMessages(licenses.First.ToString());
+                //}
+            }
+            catch (Exception ex)
+            {
+
+
+            }
+
+            return output;
+        }
         public static async Task<string> CheckNpmRegistry()
         {
             string output = null;
@@ -133,4 +314,6 @@ namespace SourcePackages.packages
             return output;
         }
     }
+
+
 }

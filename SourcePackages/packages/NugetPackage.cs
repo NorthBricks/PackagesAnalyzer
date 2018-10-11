@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace SourcePackages.packages
+namespace Northbricks.SourceDependencies
 {
-    public class NugetPackage : IPackageMagic
+    public class NugetPackage : PackageMagic
     {
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public PackageType PackageType { get; set; }
-        public string UniqueName { get; set; }
+        static string patternPackagesConfig = "*.csproj,*.vbproj";
+        public NugetPackage()
+        {
+            //Providers.Add(PackageProviders.GitHub);
+            //Providers.Add(PackageProviders.OssIndex);
+        }
 
         private static async Task SearchNugetPackageReferences(string file)
         {
@@ -44,7 +46,8 @@ namespace SourcePackages.packages
                             {
                                 packageVersion = node.Attributes["Version"].Value;
                             }
-                            FactoryPackages.AddPackage(new NugetPackage { Name = node.Attributes["Include"].Value, Version = packageVersion, UniqueName = "PackageReference", PackageType = PackageType.Nuget });
+                            PackageMagic package = new NugetPackage { Name = node.Attributes["Include"].Value, Version = packageVersion, UniqueName = "PackageReference", PackageType = PackageType.Nuget };
+                            FactoryPackages.AddPackage(package);
                         }
                         else
                         {
@@ -62,7 +65,7 @@ namespace SourcePackages.packages
         public static async Task SearchForAllPackageReferences(string projectDirectory)
         {
 
-            string[] csProjFiles = Directory.GetFiles(projectDirectory, "*.csproj", SearchOption.AllDirectories);
+            string[] csProjFiles = Directory.GetFiles(projectDirectory, patternPackagesConfig, SearchOption.AllDirectories);
             foreach (var csProjFile in csProjFiles)
             {
                 await SearchNugetPackageReferences(csProjFile);
@@ -77,12 +80,11 @@ namespace SourcePackages.packages
 
                 foreach (var packConfig in packagesConfig)
                 {
-                    //NugetPackages p = new NugetPackages();
                     var directoryName = Path.GetDirectoryName(packConfig);
                     string foundCsProjFile = "";
                     if (directoryName != null)
                     {
-                        string[] proj = Directory.GetFiles(directoryName, "*.csproj", SearchOption.TopDirectoryOnly);
+                        string[] proj = Directory.GetFiles(directoryName, patternPackagesConfig, SearchOption.TopDirectoryOnly);
 
                         if (proj.Length > 0)
                         {
@@ -98,32 +100,32 @@ namespace SourcePackages.packages
                     var file = new PackageReferenceFile(packConfig);
                     foreach (PackageReference packageReference in file.GetPackageReferences())
                     {
-                        FactoryPackages.AddPackage(new NugetPackage { Name = packageReference.Id, Version = packageReference.Version.ToNormalizedString(), UniqueName = "PackageConfig", PackageType = PackageType.Nuget });
+                        PackageMagic package = new NugetPackage { Name = packageReference.Id, Version = packageReference.Version.ToNormalizedString(), UniqueName = "PackageConfig", PackageType = PackageType.Nuget };
                         //Utils.AddToPackageInformation(new PackageInformation { PackageName = packageReference.Id, PackageVersion = packageReference.Version.ToNormalizedString(), PackageDescription = foundCsProjFile, OriginOfPackage = PackageInformation.Origin.PackageConfig, CsProjFile = foundCsProjFile }).GetAwaiter().GetResult();
-
+                        FactoryPackages.AddPackage(package);
                     }
                 }
             });
         }
+
+        public static async Task GetNugetPackageInformation()
+        {
+            IPackage pack;
+            IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("https://packages.nuget.org/api/v2");
+
+            await Task.Run(() =>
+            {
+                foreach (var item in FactoryPackages.GetPackages().FindAll(o => o.PackageType == PackageType.Nuget))
+                {
+                    pack = repo.FindPackage(item.Name, SemanticVersion.Parse(item.Version));
+                    item.NugetExtendedPackageInformation = pack;
+                    Console.WriteLine("Get Nuget Extended Package Information on " + item.Name + " " + item.Version);
+                }
+            });
+
+        }
+
+
     }
 
-
-
-    //[XmlRoot(ElementName = "package")]
-    //public class Package
-    //{
-    //    [XmlAttribute(AttributeName = "id")]
-    //    public string Id { get; set; }
-    //    [XmlAttribute(AttributeName = "targetFramework")]
-    //    public string TargetFramework { get; set; }
-    //    [XmlAttribute(AttributeName = "version")]
-    //    public string Version { get; set; }
-    //}
-
-    //[XmlRoot(ElementName = "packages")]
-    //public class Packages
-    //{
-    //    [XmlElement(ElementName = "package")]
-    //    public List<Package> Package { get; set; }
-    //}
 }
