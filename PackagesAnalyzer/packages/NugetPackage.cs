@@ -12,7 +12,7 @@ namespace Northbricks.PackagesAnalyzer
 {
     public class NugetPackage : PackageMagic
     {
-        static string patternPackagesConfig = "*.csproj,*.vbproj";
+        static string patternPackagesConfig = "*.csproj";
         public NugetPackage()
         {
             //Providers.Add(PackageProviders.GitHub);
@@ -64,8 +64,9 @@ namespace Northbricks.PackagesAnalyzer
         }
         public static async Task SearchForAllPackageReferences(string projectDirectory)
         {
-
             string[] csProjFiles = Directory.GetFiles(projectDirectory, patternPackagesConfig, SearchOption.AllDirectories);
+            Console.WriteLine($"Searching for Package References in {projectDirectory} (filter {patternPackagesConfig}");
+            Console.WriteLine($"Found {csProjFiles.Count()} package references {patternPackagesConfig}");
             foreach (var csProjFile in csProjFiles)
             {
                 await SearchNugetPackageReferences(csProjFile);
@@ -74,10 +75,11 @@ namespace Northbricks.PackagesAnalyzer
         }
         public static async Task SearchForPackagesConfig(string projectDirectory)
         {
+            Console.WriteLine($"Searching for Packages Config in {projectDirectory}");
             await Task.Run(() =>
             {
                 string[] packagesConfig = Directory.GetFiles(projectDirectory, "packages.config", SearchOption.AllDirectories);
-
+                Console.WriteLine($"Found {packagesConfig.Count()} packages.config files");
                 foreach (var packConfig in packagesConfig)
                 {
                     var directoryName = Path.GetDirectoryName(packConfig);
@@ -101,7 +103,6 @@ namespace Northbricks.PackagesAnalyzer
                     foreach (PackageReference packageReference in file.GetPackageReferences())
                     {
                         PackageMagic package = new NugetPackage { Name = packageReference.Id, Version = packageReference.Version.ToNormalizedString(), UniqueName = "PackageConfig", PackageType = PackageType.Nuget };
-                        //Utils.AddToPackageInformation(new PackageInformation { PackageName = packageReference.Id, PackageVersion = packageReference.Version.ToNormalizedString(), PackageDescription = foundCsProjFile, OriginOfPackage = PackageInformation.Origin.PackageConfig, CsProjFile = foundCsProjFile }).GetAwaiter().GetResult();
                         FactoryPackages.AddPackage(package);
                     }
                 }

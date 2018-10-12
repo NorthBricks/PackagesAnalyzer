@@ -25,13 +25,16 @@ namespace Northbricks.PackagesAnalyzer
 
         public static async Task LoopPackageJson(string packageJsonPath)
         {
+            Console.WriteLine($"Search for package.json in path {packageJsonPath}");
             string[] packageJson = Directory.GetFiles(packageJsonPath, "package.json", SearchOption.AllDirectories);
+            Console.WriteLine($"Found {packageJson.Count()} package.json (skipping package.json in directory with name node_modules");
             await Task.Run(() =>
             {
                 foreach (var item in packageJson)
                 {
                     if (!item.Contains("node_modules"))
                     {
+                        Console.WriteLine($"Read json {item}");
                         ReadPackageJsonFile(item);
                     }
                     else
@@ -53,8 +56,6 @@ namespace Northbricks.PackagesAnalyzer
                 foreach (var jToken in jsonDevDep)
                 {
                     var p = (JProperty)jToken;
-                    //var license = await RunNpmViewCheckLicense(p.Name, p.Value.ToString());
-                    //await Utils.AddToPackageInformation(new PackageInformation { PackageName = p.Name, PackageVersion = p.Value.ToString(), PackageDescription = "", OriginOfPackage = PackageInformation.Origin.Npm, FeedRegistry = NpmRegistry });
                     FactoryPackages.AddPackage(new NugetPackage { Name = p.Name, Version = p.Value.ToString(), UniqueName = "devDependencies", PackageType = PackageType.Npm });
                 }
             }
@@ -64,9 +65,6 @@ namespace Northbricks.PackagesAnalyzer
                 foreach (var jToken in jsonDep)
                 {
                     var p = (JProperty)jToken;
-                    //var license = await RunNpmViewCheckLicense(p.Name, p.Value.ToString());
-
-                    //await Utils.AddToPackageInformation(new PackageInformation { PackageName = p.Name, PackageVersion = p.Value.ToString(), PackageDescription = "", OriginOfPackage = PackageInformation.Origin.Npm, FeedRegistry = NpmRegistry });
                     FactoryPackages.AddPackage(new NugetPackage { Name = p.Name, Version = p.Value.ToString(), UniqueName = "dependencies", PackageType = PackageType.Npm });
                 }
 
@@ -76,6 +74,7 @@ namespace Northbricks.PackagesAnalyzer
 
         public static string FindNpmPath(string npmCmd)
         {
+            Console.WriteLine($"Searching for NPM path");
             npmCmd = Environment.ExpandEnvironmentVariables(npmCmd);
             if (!File.Exists(npmCmd))
             {
@@ -89,7 +88,7 @@ namespace Northbricks.PackagesAnalyzer
 
                 throw new FileNotFoundException(new FileNotFoundException().Message, npmCmd);
             }
-
+            Console.WriteLine($"NPM path found {Path.GetFullPath(npmCmd)}");
             return Path.GetFullPath(npmCmd);
         }
         public static async Task RunNpmViewCheckLicense()
